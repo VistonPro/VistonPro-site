@@ -1,46 +1,102 @@
-
-import React from "react";
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const Homepage = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+
+  const navLinks = [
+    { label: "Home", path: "/" },
+    { label: "Tools", path: "/tools" },
+    { label: "Shop", path: "/shop" },
+    { label: "Training", path: "/training" },
+  ];
+
+  const cards = [
+    {
+      icon: "💼",
+      title: "Closing Cost Calculator",
+      desc: "Estimate buyer costs in seconds with VA, FHA, and title logic built in.",
+      link: "/tools",
+    },
+    {
+      icon: "📊",
+      title: "Sales & Commission Tracker",
+      desc: "Track income, splits, and goals. Built for agents and teams.",
+      link: "/tools",
+    },
+    {
+      icon: "🎓",
+      title: "CEU Training",
+      desc: "Approved online courses for state CE requirements.",
+      link: "/training",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200 text-gray-800">
+      <nav className="bg-white shadow p-4 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <Link to="/" className="text-lg font-bold text-indigo-700">VistonPro</Link>
+          <div className="hidden md:flex space-x-6">
+            {navLinks.map(link => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`hover:text-indigo-600 transition font-medium ${location.pathname === link.path ? "text-indigo-700 font-semibold" : "text-gray-700"}`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+          <button
+            className="md:hidden text-gray-700 focus:outline-none"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            ☰
+          </button>
+        </div>
+        {mobileMenuOpen && (
+          <div className="md:hidden px-4 pt-4 pb-2 space-y-2">
+            {navLinks.map(link => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className="block text-gray-700 hover:text-indigo-600"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        )}
+      </nav>
+
       <header className="bg-gradient-to-r from-indigo-700 to-purple-700 text-white py-20 px-4 text-center shadow-lg">
         <h1 className="text-5xl font-extrabold mb-4">VistonPro</h1>
         <p className="text-xl opacity-90 max-w-2xl mx-auto">
           Powerful tools and continuing education for real estate professionals, brokers, and lenders.
         </p>
-        <a
-          href="#tools"
+        <Link
+          to="/tools"
           className="inline-block mt-8 px-8 py-3 bg-white text-indigo-700 font-semibold rounded-full shadow hover:scale-105 transition-transform"
         >
           Explore Free Tools
-        </a>
+        </Link>
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-20">
-        <section id="tools" className="grid md:grid-cols-3 gap-10 text-center">
-          {[
-            {
-              icon: "💼",
-              title: "Closing Cost Calculator",
-              desc: "Estimate buyer costs in seconds with VA, FHA, and title logic built in.",
-            },
-            {
-              icon: "📊",
-              title: "Sales & Commission Tracker",
-              desc: "Track income, splits, and goals. Built for agents and teams.",
-            },
-            {
-              icon: "🎓",
-              title: "CEU Training",
-              desc: "Approved online courses for state CE requirements.",
-            },
-          ].map((card, i) => (
-            <div key={i} className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition">
+        <section className="grid md:grid-cols-3 gap-10 text-center">
+          {cards.map((card, i) => (
+            <Link
+              to={card.link}
+              key={i}
+              className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition block text-left"
+            >
               <div className="text-4xl mb-3">{card.icon}</div>
               <h2 className="text-xl font-bold mb-2">{card.title}</h2>
               <p className="text-gray-600">{card.desc}</p>
-            </div>
+            </Link>
           ))}
         </section>
 
@@ -49,13 +105,16 @@ const Homepage = () => {
           <p className="text-lg text-gray-700 mb-6 max-w-xl mx-auto">
             We’re expanding to support CEU licensing in TX, CA, FL, NY and more. Join our early access list.
           </p>
-          <form className="flex flex-col sm:flex-row gap-4 justify-center">
+          <form className="flex flex-col sm:flex-row gap-4 justify-center max-w-2xl mx-auto">
             <input
               type="email"
               placeholder="Enter your email"
-              className="w-full sm:w-96 px-4 py-3 border border-gray-300 rounded-lg"
+              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
-            <button className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition">
+            <button
+              type="submit"
+              className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition"
+            >
               Notify Me
             </button>
           </form>
