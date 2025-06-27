@@ -39,18 +39,18 @@ const ToolsPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 text-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-rose-50 text-gray-800">
       <nav className="bg-white shadow p-4 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <Link to="/" className="text-lg font-bold text-indigo-700">VistonPro</Link>
+          <Link to="/" className="text-2xl font-extrabold text-indigo-600 tracking-tight">VISTON<span className="text-rose-600">PRO</span></Link>
           <div className="hidden md:flex space-x-6">
             {navLinks.map(link => (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`hover:text-indigo-600 transition font-medium ${
+                className={`hover:text-rose-600 transition font-medium ${
                   location.pathname === link.path
-                    ? "text-indigo-700 font-semibold"
+                    ? "text-rose-600 font-semibold"
                     : "text-gray-700"
                 }`}
               >
@@ -70,10 +70,10 @@ const ToolsPage = () => {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
           {tools.map((tool, index) => (
-            <div key={index} className="bg-white rounded-xl shadow p-6 hover:shadow-lg transition">
+            <div key={index} className="bg-white rounded-xl shadow p-6 hover:shadow-xl transition">
               <div className="text-4xl mb-4">{tool.icon}</div>
               <h2 className="text-xl font-bold mb-1">{tool.title}</h2>
-              <span className="inline-block text-sm text-white bg-indigo-500 px-3 py-1 rounded-full mb-2">{tool.status}</span>
+              <span className="inline-block text-sm text-white bg-indigo-600 px-3 py-1 rounded-full mb-2">{tool.status}</span>
               <p className="text-gray-600 text-sm">{tool.description}</p>
             </div>
           ))}
