@@ -1,6 +1,9 @@
 import React from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const ToolsPage = () => {
+  const location = useLocation();
+
   const tools = [
     {
       title: "Closing Cost Calculator",
@@ -28,15 +31,44 @@ const ToolsPage = () => {
     }
   ];
 
+  const navLinks = [
+    { label: "Home", path: "/" },
+    { label: "Tools", path: "/tools" },
+    { label: "Shop", path: "/shop" },
+    { label: "Training", path: "/training" },
+  ];
+
   return (
-    <div className="min-h-screen bg-slate-50 text-gray-800 px-6 py-16">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-slate-50 text-gray-800">
+      <nav className="bg-white shadow p-4 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <Link to="/" className="text-lg font-bold text-indigo-700">VistonPro</Link>
+          <div className="hidden md:flex space-x-6">
+            {navLinks.map(link => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`hover:text-indigo-600 transition font-medium ${
+                  location.pathname === link.path
+                    ? "text-indigo-700 font-semibold"
+                    : "text-gray-700"
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+          <button className="md:hidden text-gray-700">☰</button>
+        </div>
+      </nav>
+
+      <main className="max-w-6xl mx-auto px-6 py-16 text-center">
         <h1 className="text-4xl font-extrabold text-center text-indigo-700 mb-10">Tools + Templates for Real Estate Pros</h1>
         <p className="text-center text-gray-600 max-w-2xl mx-auto mb-12">
           Explore free tools and premium downloads for agents, brokers, and lenders. Built to save you time and elevate your brand.
         </p>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
           {tools.map((tool, index) => (
             <div key={index} className="bg-white rounded-xl shadow p-6 hover:shadow-lg transition">
               <div className="text-4xl mb-4">{tool.icon}</div>
@@ -46,7 +78,18 @@ const ToolsPage = () => {
             </div>
           ))}
         </div>
-      </div>
+
+        <Link
+          to="/"
+          className="inline-block mt-12 bg-indigo-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-indigo-700 transition"
+        >
+          ← Back to Homepage
+        </Link>
+      </main>
+
+      <footer className="bg-slate-800 text-white text-center text-sm py-6 mt-24">
+        &copy; {new Date().getFullYear()} VistonPro. All rights reserved.
+      </footer>
     </div>
   );
 };
