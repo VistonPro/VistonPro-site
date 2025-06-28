@@ -51,7 +51,6 @@ export const ShopPage = () => {
               </Link>
             ))}
           </div>
-          <button className="md:hidden text-gray-700">☰</button>
         </div>
       </nav>
 
@@ -87,12 +86,8 @@ export const ShopPage = () => {
   );
 };
 
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
-
 export const TrainingPage = () => {
   const location = useLocation();
-
   const navLinks = [
     { label: "Home", path: "/" },
     { label: "Tools", path: "/tools" },
@@ -120,7 +115,7 @@ export const TrainingPage = () => {
       hours: "2 Hours",
       description: "Stay current with land use and environmental responsibilities.",
       icon: "🌿",
-      link: "https://stephanie-s-site-3116.thinkific.com/manage/courses/2888258"
+      link: "https://stephanie-s-site-3116.thinkific.com/courses/environmental-issues-and-land-use"
     }
   ];
 
@@ -144,7 +139,6 @@ export const TrainingPage = () => {
               </Link>
             ))}
           </div>
-          <button className="md:hidden text-gray-700">☰</button>
         </div>
       </nav>
 
