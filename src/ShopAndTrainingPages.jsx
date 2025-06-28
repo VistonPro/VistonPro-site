@@ -87,6 +87,9 @@ export const ShopPage = () => {
   );
 };
 
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+
 export const TrainingPage = () => {
   const location = useLocation();
 
@@ -103,18 +106,21 @@ export const TrainingPage = () => {
       hours: "2 Hours",
       description: "Understand the essentials of Fair Housing laws and compliance.",
       icon: "🏠",
+      link: "https://stephanie-s-site-3116.thinkific.com/courses/fair-housing-101"
     },
     {
       title: "Required Disclosures",
       hours: "2 Hours",
       description: "Learn how to properly manage licensee disclosures and risk.",
       icon: "📑",
+      link: "https://stephanie-s-site-3116.thinkific.com/courses/required-disclosures"
     },
     {
-      title: "Environmental Issues",
+      title: "Environmental Issues & Land Use",
       hours: "2 Hours",
       description: "Stay current with land use and environmental responsibilities.",
       icon: "🌿",
+      link: "https://stephanie-s-site-3116.thinkific.com/manage/courses/2888258"
     }
   ];
 
@@ -150,12 +156,18 @@ export const TrainingPage = () => {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
           {courses.map((course, index) => (
-            <div key={index} className="bg-white rounded-xl shadow p-6 hover:shadow-xl transition">
+            <a
+              key={index}
+              href={course.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white rounded-xl shadow p-6 hover:shadow-xl transition block"
+            >
               <div className="text-4xl mb-4">{course.icon}</div>
               <h2 className="text-xl font-bold mb-1">{course.title}</h2>
               <span className="inline-block text-sm text-white bg-indigo-600 px-3 py-1 rounded-full mb-2">{course.hours}</span>
               <p className="text-gray-600 text-sm">{course.description}</p>
-            </div>
+            </a>
           ))}
         </div>
 
