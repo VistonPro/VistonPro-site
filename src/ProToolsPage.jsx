@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 
 const ProToolsPage = () => {
   const location = useLocation();
+
   const navLinks = [
     { label: "Home", path: "/" },
     { label: "Tools", path: "/tools" },
@@ -74,7 +75,7 @@ const ProToolsPage = () => {
       </main>
 
       <footer className="bg-slate-800 text-white text-center text-sm py-6 mt-24">
-        &copy; {new Date().getFullYear()} VistonPro. All rights reserved.
+        &copy; {new Date().getFullYear()} VISTONPro. All rights reserved.
       </footer>
     </div>
   );
