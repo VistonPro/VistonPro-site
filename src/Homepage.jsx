@@ -10,32 +10,27 @@ const Homepage = () => {
     { label: "Tools", path: "/tools" },
     { label: "Shop", path: "/shop" },
     { label: "Training", path: "/training" },
+    { label: "Pro Tools", path: "/pro-tools" },
   ];
 
   const cards = [
     {
       icon: "💼",
       title: "Closing Cost Calculator",
-      desc: "Estimate buyer costs with VA, FHA, and title logic built in.",
+      desc: "Estimate buyer costs in seconds with VA, FHA, and title logic built in.",
       link: "/tools",
     },
     {
       icon: "📊",
       title: "Sales & Commission Tracker",
-      desc: "Track income, splits, and goals. Built for agents and teams.",
+      desc: "Track income, splits, and production goals with ease.",
       link: "/tools",
     },
     {
       icon: "🎓",
-      title: "CEU Training",
-      desc: "Approved online courses for state CE requirements.",
+      title: "CEU Training (State Approved)",
+      desc: "Complete your continuing education online at your pace.",
       link: "/training",
-    },
-    {
-      icon: "🧰",
-      title: "Marketing Templates",
-      desc: "Editable real estate flyers, postcards & listing kits.",
-      link: "/shop",
     },
   ];
 
@@ -43,7 +38,9 @@ const Homepage = () => {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-rose-50 text-gray-800">
       <nav className="bg-white shadow p-4 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <Link to="/" className="text-2xl font-extrabold text-indigo-600 tracking-tight">VISTON<span className="text-rose-600">PRO</span></Link>
+          <Link to="/" className="text-2xl font-extrabold text-indigo-600 tracking-tight">
+            VISTON<span className="text-rose-600">PRO</span>
+          </Link>
           <div className="hidden md:flex space-x-6">
             {navLinks.map(link => (
               <Link
@@ -82,14 +79,14 @@ const Homepage = () => {
         )}
       </nav>
 
-      <header className="bg-gradient-to-r from-indigo-600 to-rose-600 text-white py-20 px-4 text-center shadow-lg">
-        <h1 className="text-5xl font-extrabold mb-4">Real Estate Tools & Templates</h1>
+      <header className="bg-gradient-to-r from-indigo-700 to-rose-600 text-white py-20 px-4 text-center shadow-lg">
+        <h1 className="text-5xl font-extrabold mb-4">VISTONPRO</h1>
         <p className="text-xl opacity-90 max-w-2xl mx-auto">
-          Digital calculators, CEU training, and marketing kits — all in one modern platform.
+          Tools, training, and premium resources for real estate professionals, brokers, and lenders.
         </p>
         <Link
           to="/tools"
-          className="inline-block mt-8 px-8 py-3 bg-white text-indigo-600 font-semibold rounded-full shadow hover:scale-105 transition-transform"
+          className="inline-block mt-8 px-8 py-3 bg-white text-indigo-700 font-semibold rounded-full shadow hover:scale-105 transition-transform"
         >
           Explore Free Tools
         </Link>
@@ -110,15 +107,31 @@ const Homepage = () => {
           ))}
         </section>
 
+        {/* ✅ Pro Tool Callout */}
+        <section className="mt-24 text-center max-w-4xl mx-auto">
+          <h2 className="text-3xl font-extrabold text-indigo-700 mb-4">
+            Unlock the Pro Closing Cost Tool
+          </h2>
+          <p className="text-lg text-gray-700 mb-6">
+            Advanced VA/FHA logic, title fees, export-ready output. One-time payment, lifetime access — no subscription.
+          </p>
+          <Link
+            to="/pro-tools"
+            className="inline-block bg-rose-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-rose-700 transition"
+          >
+            Buy Now for $99
+          </Link>
+        </section>
+
         <section className="bg-white mt-24 text-center py-16 px-6 rounded-3xl shadow-xl">
-          <h2 className="text-3xl font-extrabold mb-4 text-indigo-700">🚀 CEU Expansion Coming Soon</h2>
-          <p className="text-lg text-gray-700 mb-6 max-w-xl mx-auto">
-            We’re expanding CEU support to TX, CA, FL, NY and more. Join the early access list.
+          <h2 className="text-3xl font-extrabold mb-4 text-indigo-800">🚀 CEU Expansion Coming Soon</h2>
+          <p className="text-gray-700 text-lg mb-6 max-w-xl mx-auto">
+            We’re expanding to support CE requirements in TX, FL, CA, NY and more. Be first to know.
           </p>
           <form className="flex flex-col sm:flex-row gap-4 justify-center max-w-2xl mx-auto">
             <input
               type="email"
-              placeholder="Enter your email"
+              placeholder="Enter your email to get early access"
               className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <button
@@ -132,7 +145,7 @@ const Homepage = () => {
       </main>
 
       <footer className="bg-slate-800 text-white text-center text-sm py-6 mt-24">
-        &copy; {new Date().getFullYear()} VistonPro. All rights reserved.
+        &copy; {new Date().getFullYear()} VISTONPRO. All rights reserved.
       </footer>
     </div>
   );
