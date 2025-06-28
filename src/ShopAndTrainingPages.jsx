@@ -115,7 +115,7 @@ export const TrainingPage = () => {
       hours: "2 Hours",
       description: "Stay current with land use and environmental responsibilities.",
       icon: "🌿",
-      link: "https://stephanie-s-site-3116.thinkific.com/courses/environmental-issues-and-land-use"
+      link: "https://stephanie-s-site-3116.thinkific.com/courses/take/Environmental-Issues-Land-Use/lessons/58645797-introduction"
     }
   ];
 
