@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 
 export default function ClosingCostApp() {
+  // === Deal & Agent Info ===
   const [preparedFor, setPreparedFor] = useState("");
   const [agentName, setAgentName] = useState("");
   const [company, setCompany] = useState("");
   const [date, setDate] = useState("");
   const [logo, setLogo] = useState(null);
 
+  // === Loan Inputs ===
   const [salesPrice, setSalesPrice] = useState(250000);
   const [downPaymentPercent, setDownPaymentPercent] = useState(0);
   const [vaFeePercent, setVaFeePercent] = useState(0);
@@ -16,12 +18,12 @@ export default function ClosingCostApp() {
   const [annualTaxes, setAnnualTaxes] = useState(2500);
   const [annualInsurance, setAnnualInsurance] = useState(1200);
 
+  // === Loan Math ===
   const downPayment = salesPrice * (downPaymentPercent / 100);
   const vaFundingFee = salesPrice * (vaFeePercent / 100);
   const fhaMortgageIns = salesPrice * (fhaFeePercent / 100);
   const loanAmount = salesPrice - downPayment + vaFundingFee + fhaMortgageIns;
 
-  // PMT formula
   const pmt = (rate, nper, pv) => {
     const r = rate / 12 / 100;
     return (r * -pv) / (1 - Math.pow(1 + r, -nper));
@@ -37,15 +39,24 @@ export default function ClosingCostApp() {
   const monthlyTaxes = Math.round(annualTaxes / 12);
   const monthlyPayment = principalAndInterest + mortgageInsurance + monthlyInsurance + monthlyTaxes;
 
+  // === Fee Table (Add/Remove Rows) ===
   const [fees, setFees] = useState([
     { desc: "Loan Origination Fee", cost: 1000, paidBy: "Buyer" },
-    { desc: "Escrow Fees", cost: 500, paidBy: "Split" },
-    { desc: "Owner Title Insurance", cost: 800, paidBy: "Seller" },
   ]);
 
   const updateFee = (index, field, value) => {
     const updated = [...fees];
     updated[index][field] = field === "cost" ? parseFloat(value) || 0 : value;
+    setFees(updated);
+  };
+
+  const addFee = () => {
+    setFees([...fees, { desc: "New Fee", cost: 0, paidBy: "Buyer" }]);
+  };
+
+  const removeFee = (index) => {
+    const updated = [...fees];
+    updated.splice(index, 1);
     setFees(updated);
   };
 
@@ -59,9 +70,9 @@ export default function ClosingCostApp() {
   const totalBuyerCosts = fees.reduce((sum, fee) => sum + getBuyerSellerAmounts(fee)[0], 0);
   const totalSellerCosts = fees.reduce((sum, fee) => sum + getBuyerSellerAmounts(fee)[1], 0);
 
-  // Prepaids example
+  // === Prepaids ===
   const upfrontMI = fhaMortgageIns;
-  const prepaidInterest = (loanAmount * (interestRate / 100) / 365) * 7; // Example 7 days
+  const prepaidInterest = (loanAmount * (interestRate / 100) / 365) * 7; // Example: 7 days
   const prepaidTotal = upfrontMI + prepaidInterest;
 
   const totalToClose = downPayment + totalBuyerCosts + prepaidTotal;
@@ -70,6 +81,7 @@ export default function ClosingCostApp() {
     <div className="max-w-5xl mx-auto p-8 bg-white rounded shadow">
       <h1 className="text-3xl font-bold mb-4 text-indigo-700">Buyer's Estimated Closing Costs</h1>
 
+      {/* === Agent & Deal Info === */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div>
           <label>Prepared For</label>
@@ -104,6 +116,7 @@ export default function ClosingCostApp() {
         </div>
       </div>
 
+      {/* === Loan Summary === */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div><strong>Loan Amount:</strong> ${loanAmount.toFixed(2)}</div>
         <div><strong>Principal & Interest:</strong> ${principalAndInterest}</div>
@@ -111,9 +124,10 @@ export default function ClosingCostApp() {
         <div><strong>Monthly Payment:</strong> ${monthlyPayment}</div>
       </div>
 
-      <h2 className="text-xl font-bold mb-2">Fee Table</h2>
+      {/* === Fee Table === */}
+      <h2 className="text-xl font-bold mb-2 mt-8">Fee Table</h2>
       {fees.map((fee, idx) => (
-        <div key={idx} className="flex gap-2 mb-2">
+        <div key={idx} className="flex gap-2 mb-2 items-center">
           <input value={fee.desc} onChange={e => updateFee(idx, "desc", e.target.value)} className="flex-1 border p-2" />
           <input type="number" value={fee.cost} onChange={e => updateFee(idx, "cost", e.target.value)} className="w-24 border p-2" />
           <select value={fee.paidBy} onChange={e => updateFee(idx, "paidBy", e.target.value)} className="border p-2">
@@ -123,9 +137,17 @@ export default function ClosingCostApp() {
           </select>
           <div className="w-24">Buyer: ${getBuyerSellerAmounts(fee)[0].toFixed(2)}</div>
           <div className="w-24">Seller: ${getBuyerSellerAmounts(fee)[1].toFixed(2)}</div>
+          <button onClick={() => removeFee(idx)} className="text-red-600 font-bold ml-2">✕</button>
         </div>
       ))}
+      <button
+        onClick={addFee}
+        className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 mt-4"
+      >
+        + Add Fee
+      </button>
 
+      {/* === Prepaids === */}
       <div className="my-6">
         <h2 className="text-xl font-bold mb-2">Prepaids</h2>
         <div>Upfront MI: ${upfrontMI.toFixed(2)}</div>
@@ -133,6 +155,7 @@ export default function ClosingCostApp() {
         <div>Prepaid Total: ${prepaidTotal.toFixed(2)}</div>
       </div>
 
+      {/* === Totals === */}
       <div className="p-4 bg-indigo-50 rounded">
         <h2 className="text-xl font-bold mb-2">Summary</h2>
         <div>Buyer Closing Costs: ${totalBuyerCosts.toFixed(2)}</div>
@@ -144,4 +167,3 @@ export default function ClosingCostApp() {
     </div>
   );
 }
-// force rebuild
