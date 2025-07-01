@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import ProCalculator from "./ProCalculator"; // Adjust path if needed!
 import ClosingCostApp from "./ClosingCostApp";
 
 
@@ -49,7 +48,7 @@ const ProToolsPage = () => {
       {/* ✅ Main Content */}
       <main className="max-w-6xl mx-auto px-6 py-16">
         <h1 className="text-4xl font-extrabold text-indigo-700 mb-4 text-center">
-          Pro Closing Cost Tool
+            <ProCalculator />
         </h1>
         <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
           Use this advanced closing cost calculator for accurate buyer & seller
