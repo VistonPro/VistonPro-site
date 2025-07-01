@@ -1,0 +1,146 @@
+import React, { useState } from "react";
+
+export default function ClosingCostApp() {
+  const [preparedFor, setPreparedFor] = useState("");
+  const [agentName, setAgentName] = useState("");
+  const [company, setCompany] = useState("");
+  const [date, setDate] = useState("");
+  const [logo, setLogo] = useState(null);
+
+  const [salesPrice, setSalesPrice] = useState(250000);
+  const [downPaymentPercent, setDownPaymentPercent] = useState(0);
+  const [vaFeePercent, setVaFeePercent] = useState(0);
+  const [fhaFeePercent, setFhaFeePercent] = useState(0);
+  const [interestRate, setInterestRate] = useState(6.5);
+  const [termYears, setTermYears] = useState(30);
+  const [annualTaxes, setAnnualTaxes] = useState(2500);
+  const [annualInsurance, setAnnualInsurance] = useState(1200);
+
+  const downPayment = salesPrice * (downPaymentPercent / 100);
+  const vaFundingFee = salesPrice * (vaFeePercent / 100);
+  const fhaMortgageIns = salesPrice * (fhaFeePercent / 100);
+  const loanAmount = salesPrice - downPayment + vaFundingFee + fhaMortgageIns;
+
+  // PMT formula
+  const pmt = (rate, nper, pv) => {
+    const r = rate / 12 / 100;
+    return (r * -pv) / (1 - Math.pow(1 + r, -nper));
+  };
+  const principalAndInterest = Math.round(pmt(interestRate, termYears * 12, loanAmount));
+  const mortgageInsurance = Math.round(
+    downPaymentPercent < 5 ? 0.011 * loanAmount / 12 :
+    downPaymentPercent < 10 ? 0.0071 * loanAmount / 12 :
+    downPaymentPercent < 15 ? 0.0054 * loanAmount / 12 :
+    downPaymentPercent < 20 ? 0.0039 * loanAmount / 12 : 0
+  );
+  const monthlyInsurance = Math.round(annualInsurance / 12);
+  const monthlyTaxes = Math.round(annualTaxes / 12);
+  const monthlyPayment = principalAndInterest + mortgageInsurance + monthlyInsurance + monthlyTaxes;
+
+  const [fees, setFees] = useState([
+    { desc: "Loan Origination Fee", cost: 1000, paidBy: "Buyer" },
+    { desc: "Escrow Fees", cost: 500, paidBy: "Split" },
+    { desc: "Owner Title Insurance", cost: 800, paidBy: "Seller" },
+  ]);
+
+  const updateFee = (index, field, value) => {
+    const updated = [...fees];
+    updated[index][field] = field === "cost" ? parseFloat(value) || 0 : value;
+    setFees(updated);
+  };
+
+  const getBuyerSellerAmounts = (fee) => {
+    if (fee.paidBy === "Buyer") return [fee.cost, 0];
+    if (fee.paidBy === "Seller") return [0, fee.cost];
+    if (fee.paidBy === "Split") return [fee.cost / 2, fee.cost / 2];
+    return [0, 0];
+  };
+
+  const totalBuyerCosts = fees.reduce((sum, fee) => sum + getBuyerSellerAmounts(fee)[0], 0);
+  const totalSellerCosts = fees.reduce((sum, fee) => sum + getBuyerSellerAmounts(fee)[1], 0);
+
+  // Prepaids example
+  const upfrontMI = fhaMortgageIns;
+  const prepaidInterest = (loanAmount * (interestRate / 100) / 365) * 7; // Example 7 days
+  const prepaidTotal = upfrontMI + prepaidInterest;
+
+  const totalToClose = downPayment + totalBuyerCosts + prepaidTotal;
+
+  return (
+    <div className="max-w-5xl mx-auto p-8 bg-white rounded shadow">
+      <h1 className="text-3xl font-bold mb-4 text-indigo-700">Buyer's Estimated Closing Costs</h1>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div>
+          <label>Prepared For</label>
+          <input value={preparedFor} onChange={e => setPreparedFor(e.target.value)} className="w-full border p-2 mb-2" />
+          <label>Agent Name</label>
+          <input value={agentName} onChange={e => setAgentName(e.target.value)} className="w-full border p-2 mb-2" />
+          <label>Company</label>
+          <input value={company} onChange={e => setCompany(e.target.value)} className="w-full border p-2 mb-2" />
+          <label>Date</label>
+          <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full border p-2 mb-2" />
+          <label>Upload Logo</label>
+          <input type="file" onChange={e => setLogo(e.target.files[0])} className="w-full border p-2 mb-2" />
+        </div>
+
+        <div>
+          <label>Sales Price</label>
+          <input type="number" value={salesPrice} onChange={e => setSalesPrice(parseFloat(e.target.value) || 0)} className="w-full border p-2 mb-2" />
+          <label>Down Payment %</label>
+          <input type="number" value={downPaymentPercent} onChange={e => setDownPaymentPercent(parseFloat(e.target.value) || 0)} className="w-full border p-2 mb-2" />
+          <label>VA Funding Fee %</label>
+          <input type="number" value={vaFeePercent} onChange={e => setVaFeePercent(parseFloat(e.target.value) || 0)} className="w-full border p-2 mb-2" />
+          <label>FHA Mortgage INS %</label>
+          <input type="number" value={fhaFeePercent} onChange={e => setFhaFeePercent(parseFloat(e.target.value) || 0)} className="w-full border p-2 mb-2" />
+          <label>Interest Rate %</label>
+          <input type="number" value={interestRate} onChange={e => setInterestRate(parseFloat(e.target.value) || 0)} className="w-full border p-2 mb-2" />
+          <label>Term (Years)</label>
+          <input type="number" value={termYears} onChange={e => setTermYears(parseInt(e.target.value) || 0)} className="w-full border p-2 mb-2" />
+          <label>Annual Taxes</label>
+          <input type="number" value={annualTaxes} onChange={e => setAnnualTaxes(parseFloat(e.target.value) || 0)} className="w-full border p-2 mb-2" />
+          <label>Annual Hazard Insurance</label>
+          <input type="number" value={annualInsurance} onChange={e => setAnnualInsurance(parseFloat(e.target.value) || 0)} className="w-full border p-2 mb-2" />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div><strong>Loan Amount:</strong> ${loanAmount.toFixed(2)}</div>
+        <div><strong>Principal & Interest:</strong> ${principalAndInterest}</div>
+        <div><strong>MI:</strong> ${mortgageInsurance}</div>
+        <div><strong>Monthly Payment:</strong> ${monthlyPayment}</div>
+      </div>
+
+      <h2 className="text-xl font-bold mb-2">Fee Table</h2>
+      {fees.map((fee, idx) => (
+        <div key={idx} className="flex gap-2 mb-2">
+          <input value={fee.desc} onChange={e => updateFee(idx, "desc", e.target.value)} className="flex-1 border p-2" />
+          <input type="number" value={fee.cost} onChange={e => updateFee(idx, "cost", e.target.value)} className="w-24 border p-2" />
+          <select value={fee.paidBy} onChange={e => updateFee(idx, "paidBy", e.target.value)} className="border p-2">
+            <option>Buyer</option>
+            <option>Seller</option>
+            <option>Split</option>
+          </select>
+          <div className="w-24">Buyer: ${getBuyerSellerAmounts(fee)[0].toFixed(2)}</div>
+          <div className="w-24">Seller: ${getBuyerSellerAmounts(fee)[1].toFixed(2)}</div>
+        </div>
+      ))}
+
+      <div className="my-6">
+        <h2 className="text-xl font-bold mb-2">Prepaids</h2>
+        <div>Upfront MI: ${upfrontMI.toFixed(2)}</div>
+        <div>Prepaid Interest (7 days): ${prepaidInterest.toFixed(2)}</div>
+        <div>Prepaid Total: ${prepaidTotal.toFixed(2)}</div>
+      </div>
+
+      <div className="p-4 bg-indigo-50 rounded">
+        <h2 className="text-xl font-bold mb-2">Summary</h2>
+        <div>Buyer Closing Costs: ${totalBuyerCosts.toFixed(2)}</div>
+        <div>Seller Closing Costs: ${totalSellerCosts.toFixed(2)}</div>
+        <div>Prepaids: ${prepaidTotal.toFixed(2)}</div>
+        <div>Down Payment: ${downPayment.toFixed(2)}</div>
+        <div className="text-lg font-bold mt-2">Total to Close: ${totalToClose.toFixed(2)}</div>
+      </div>
+    </div>
+  );
+}

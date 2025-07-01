@@ -3,6 +3,8 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import ProCalculator from "./ProCalculator"; // Adjust path if needed!
+import ClosingCostApp from "./ClosingCostApp";
+
 
 const ProToolsPage = () => {
   const location = useLocation();
