@@ -1,9 +1,6 @@
-// TEST Save
-
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import ClosingCostApp from "./ClosingCostApp";
-
 
 const ProToolsPage = () => {
   const location = useLocation();
@@ -48,16 +45,19 @@ const ProToolsPage = () => {
       {/* ✅ Main Content */}
       <main className="max-w-6xl mx-auto px-6 py-16">
         <h1 className="text-4xl font-extrabold text-indigo-700 mb-4 text-center">
-            <ProCalculator />
+          Pro Closing Cost Tool
         </h1>
         <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
           Use this advanced closing cost calculator for accurate buyer & seller
-          estimates. Just enter your sales price, choose your fee type, and let
-          the tool handle the math — VA, FHA, title fees, and more.
+          estimates. Enter your sales price, select loan options, and let the
+          tool handle the math — VA, FHA, title fees, and more.
         </p>
 
-        {/* ✅ If you want a Buy Now CTA, keep this — optional */}
-        <div className="flex justify-center mb-12">
+        {/* ✅ Your ClosingCostApp */}
+        <ClosingCostApp />
+
+        {/* ✅ Buy Now CTA — optional */}
+        <div className="flex justify-center mt-12">
           <a
             href="YOUR_STRIPE_LINK_HERE"
             target="_blank"
@@ -67,11 +67,6 @@ const ProToolsPage = () => {
             Buy Now – $99 One-Time
           </a>
         </div>
-
-        {/* ✅ Your React Calculator */}
-        <section className="mb-12">
-          <ProCalculator />
-        </section>
 
         {/* ✅ Back to Home */}
         <div className="text-center mt-12">
@@ -93,5 +88,3 @@ const ProToolsPage = () => {
 };
 
 export default ProToolsPage;
-
-
