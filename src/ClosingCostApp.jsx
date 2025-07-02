@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 export default function ClosingCostApp() {
-  // === Basic Info ===
+  // === Deal Info ===
   const [preparedFor, setPreparedFor] = useState("");
   const [agentName, setAgentName] = useState("");
   const [company, setCompany] = useState("");
@@ -22,10 +22,6 @@ export default function ClosingCostApp() {
   const [insuranceMonths, setInsuranceMonths] = useState(0);
   const [prepaidDays, setPrepaidDays] = useState(0);
   const [reserves, setReserves] = useState(0);
-
-  // === Subscriber only check ===
-  const userIsSubscriber = true; // placeholder
-  if (!userIsSubscriber) return <p className="p-10">🔒 Please subscribe to access this tool.</p>;
 
   const titleInsuranceChart = [
     { price: 50000, owner: 382, lender: 189.75 },
@@ -144,23 +140,125 @@ export default function ClosingCostApp() {
 
   return (
     <div id="print-area" className="max-w-5xl mx-auto p-8 bg-white rounded shadow">
-      {/* === Brand + Header === */}
-      <h1 className="text-3xl font-bold mb-4 text-indigo-700">Buyer's Estimated Closing Costs</h1>
+      <h1 className="text-3xl font-bold mb-4 text-indigo-700">Closing Cost Estimate</h1>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {/* Deal Info */}
-        {/* Loan Inputs */}
+        <div>
+          <label>Prepared For</label>
+          <input value={preparedFor} onChange={e => setPreparedFor(e.target.value)} className="w-full border p-2 mb-2" />
+          <label>Agent Name</label>
+          <input value={agentName} onChange={e => setAgentName(e.target.value)} className="w-full border p-2 mb-2" />
+          <label>Company</label>
+          <input value={company} onChange={e => setCompany(e.target.value)} className="w-full border p-2 mb-2" />
+          <label>Date</label>
+          <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full border p-2 mb-2" />
+        </div>
+
+        <div>
+          <label>Loan Type</label>
+          <select value={loanType} onChange={e => setLoanType(e.target.value)} className="w-full border p-2 mb-2">
+            <option value="">-- Select Loan Type --</option>
+            <option value="VA">VA</option>
+            <option value="FHA">FHA</option>
+            <option value="Conventional">Conventional</option>
+            <option value="USDA">USDA</option>
+          </select>
+
+          {loanType === "VA" && (
+            <>
+              <label>VA Funding Fee %</label>
+              <select value={vaFeePercent} onChange={e => setVaFeePercent(parseFloat(e.target.value))} className="w-full border p-2 mb-2">
+                <option value="0">-- Select VA Funding Fee --</option>
+                <option value="2.3">2.3%</option>
+                <option value="3.6">3.6%</option>
+                <option value="1.65">1.65%</option>
+              </select>
+            </>
+          )}
+
+          {loanType === "FHA" && (
+            <>
+              <label>FHA Mortgage INS %</label>
+              <select value={fhaFeePercent} onChange={e => setFhaFeePercent(parseFloat(e.target.value))} className="w-full border p-2 mb-2">
+                <option value="0">None</option>
+                <option value="1.75">1.75%</option>
+              </select>
+            </>
+          )}
+
+          <label>Sales Price</label>
+          <input type="number" value={salesPrice} onChange={e => setSalesPrice(parseFloat(e.target.value) || 0)} className="w-full border p-2 mb-2" />
+          <label>Down Payment %</label>
+          <input type="number" value={downPaymentPercent} onChange={e => setDownPaymentPercent(parseFloat(e.target.value) || 0)} className="w-full border p-2 mb-2" />
+          <label>Interest Rate %</label>
+          <input type="number" value={interestRate} onChange={e => setInterestRate(parseFloat(e.target.value) || 0)} className="w-full border p-2 mb-2" />
+          <label>Term (Years)</label>
+          <input type="number" value={termYears} onChange={e => setTermYears(parseInt(e.target.value) || 0)} className="w-full border p-2 mb-2" />
+          <label>Annual Taxes</label>
+          <input type="number" value={annualTaxes} onChange={e => setAnnualTaxes(parseFloat(e.target.value) || 0)} className="w-full border p-2 mb-2" />
+          <label>Annual Hazard Insurance</label>
+          <input type="number" value={annualInsurance} onChange={e => setAnnualInsurance(parseFloat(e.target.value) || 0)} className="w-full border p-2 mb-2" />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {/* Fee Table */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div><strong>Loan Amount:</strong> ${loanAmount.toFixed(2)}</div>
+        <div><strong>Principal & Interest:</strong> ${principalAndInterest}</div>
+        <div><strong>MI:</strong> ${mortgageInsurance}</div>
+        <div><strong>Monthly Payment:</strong> ${monthlyPayment}</div>
       </div>
 
-      <div className="my-6 border-t pt-4">
-        <h2 className="text-xl font-bold mb-2">Closing Costs Total: ${totalBuyerCosts.toFixed(2)}</h2>
+      <h2 className="text-xl font-bold mb-2 mt-8">Fee Table</h2>
+      {fees.map((fee, idx) => (
+        <div key={idx} className="flex gap-2 mb-2 items-center">
+          <select value={fee.type} onChange={e => updateFee(idx, "type", e.target.value)} className="border p-2">
+            {commonFeeTypes.map(type => <option key={type}>{type}</option>)}
+          </select>
+          <input value={fee.desc} onChange={e => updateFee(idx, "desc", e.target.value)} className="flex-1 border p-2" />
+          <input type="number" value={fee.cost} onChange={e => updateFee(idx, "cost", e.target.value)} className="w-24 border p-2" />
+          <select value={fee.paidBy} onChange={e => updateFee(idx, "paidBy", e.target.value)} className="border p-2">
+            <option>Buyer</option>
+            <option>Seller</option>
+            <option>Split</option>
+          </select>
+          <div className="w-24">Buyer: ${getBuyerSellerAmounts(fee)[0].toFixed(2)}</div>
+          <div className="w-24">Seller: ${getBuyerSellerAmounts(fee)[1].toFixed(2)}</div>
+          <button onClick={() => removeFee(idx)} className="text-red-600 font-bold ml-2">✕</button>
+        </div>
+      ))}
+      <button onClick={addFee} className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 mt-4">+ Add Fee</button>
+
+      <div className="text-right font-bold mt-2">
+        Closing Costs Total: ${totalBuyerCosts.toFixed(2)}
       </div>
 
-      <div className="my-6 border-t pt-4">
-        <h2 className="text-xl font-bold mb-2">Prepaids Total: ${prepaidTotal.toFixed(2)}</h2>
+      <div className="my-6">
+        <h2 className="text-xl font-bold mb-2">Prepaids</h2>
+        <label>Upfront MI (FHA only): ${upfrontMI.toFixed(2)}</label><br />
+        <label>Taxes (Months)</label>
+        <select value={taxMonths} onChange={e => setTaxMonths(parseInt(e.target.value))} className="border p-2 mb-2 ml-2">
+          {[...Array(13).keys()].map(n => <option key={n} value={n}>{n}</option>)}
+        </select>
+        <div>Prepaid Taxes: ${prepaidTaxes.toFixed(2)}</div>
+
+        <label>Insurance (Months)</label>
+        <select value={insuranceMonths} onChange={e => setInsuranceMonths(parseInt(e.target.value))} className="border p-2 mb-2 ml-2">
+          {[...Array(13).keys()].map(n => <option key={n} value={n}>{n}</option>)}
+        </select>
+        <div>Prepaid Insurance: ${prepaidInsurance.toFixed(2)}</div>
+
+        <label>Prepaid Interest (Days)</label>
+        <select value={prepaidDays} onChange={e => setPrepaidDays(parseInt(e.target.value))} className="border p-2 mb-2 ml-2">
+          {[...Array(32).keys()].slice(1).map(n => <option key={n} value={n}>{n}</option>)}
+        </select>
+        <div>Prepaid Interest: ${prepaidInterest.toFixed(2)}</div>
+
+        <label>Reserves</label>
+        <input type="number" value={reserves} onChange={e => setReserves(parseFloat(e.target.value) || 0)} className="border p-2 mb-2 ml-2" />
+
+        <div className="text-right font-bold mt-2">
+          Prepaids Total: ${prepaidTotal.toFixed(2)}
+        </div>
       </div>
 
       <div className="p-4 bg-indigo-50 rounded">
@@ -178,4 +276,3 @@ export default function ClosingCostApp() {
     </div>
   );
 }
-
