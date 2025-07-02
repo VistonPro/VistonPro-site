@@ -1,27 +1,42 @@
 import React, { useState } from "react";
 
 export default function ClosingCostApp() {
-  // === Deal & Agent Info ===
+  // === Loan & Deal Info ===
   const [preparedFor, setPreparedFor] = useState("");
   const [agentName, setAgentName] = useState("");
   const [company, setCompany] = useState("");
   const [date, setDate] = useState("");
   const [logo, setLogo] = useState(null);
 
-  // === Loan Inputs ===
+  const [loanType, setLoanType] = useState("");
   const [salesPrice, setSalesPrice] = useState(250000);
   const [downPaymentPercent, setDownPaymentPercent] = useState(0);
-  const [vaFeePercent, setVaFeePercent] = useState(0);
-  const [fhaFeePercent, setFhaFeePercent] = useState(0);
   const [interestRate, setInterestRate] = useState(6.5);
   const [termYears, setTermYears] = useState(30);
   const [annualTaxes, setAnnualTaxes] = useState(2500);
   const [annualInsurance, setAnnualInsurance] = useState(1200);
 
-  // === Loan Math ===
+  const [vaFeePercent, setVaFeePercent] = useState(0);
+  const [fhaFeePercent, setFhaFeePercent] = useState(0);
+
+  // === Title Insurance Chart ===
+  const titleInsuranceChart = [
+    { price: 28000, owner: 250, lender: 175 },
+    { price: 29000, owner: 256, lender: 175 },
+    { price: 30000, owner: 262, lender: 175 },
+    { price: 50000, owner: 382, lender: 189.75 },
+    { price: 100000, owner: 582, lender: 250 },
+    { price: 200000, owner: 882, lender: 339.75 },
+    { price: 300000, owner: 1182, lender: 429.75 },
+    { price: 400000, owner: 1482, lender: 519.75 },
+    { price: 500000, owner: 1782, lender: 609.75 },
+    { price: 1000000, owner: 2907, lender: 947.25 },
+    // Add more rows as needed...
+  ];
+
   const downPayment = salesPrice * (downPaymentPercent / 100);
-  const vaFundingFee = salesPrice * (vaFeePercent / 100);
-  const fhaMortgageIns = salesPrice * (fhaFeePercent / 100);
+  const vaFundingFee = loanType === "VA" ? salesPrice * (vaFeePercent / 100) : 0;
+  const fhaMortgageIns = loanType === "FHA" ? salesPrice * (fhaFeePercent / 100) : 0;
   const loanAmount = salesPrice - downPayment + vaFundingFee + fhaMortgageIns;
 
   const pmt = (rate, nper, pv) => {
@@ -39,19 +54,58 @@ export default function ClosingCostApp() {
   const monthlyTaxes = Math.round(annualTaxes / 12);
   const monthlyPayment = principalAndInterest + mortgageInsurance + monthlyInsurance + monthlyTaxes;
 
-  // === Fee Table (Add/Remove Rows) ===
+  // === Fee Table with dropdown types ===
   const [fees, setFees] = useState([
-    { desc: "Loan Origination Fee", cost: 1000, paidBy: "Buyer" },
+    { type: "Custom", desc: "Custom Fee", cost: 0, paidBy: "Buyer" },
   ]);
+
+  const getTitleInsurance = (price, type) => {
+    let match = titleInsuranceChart[0];
+    for (let i = 1; i < titleInsuranceChart.length; i++) {
+      if (titleInsuranceChart[i].price <= price) {
+        match = titleInsuranceChart[i];
+      } else {
+        break;
+      }
+    }
+    return type === "Owner Title Insurance" ? match.owner : match.lender;
+  };
+
+  const getEscrowFee = (price) => {
+    return price > 27999 ? (price / 1000) * 1.25 + 263 : 263;
+  };
 
   const updateFee = (index, field, value) => {
     const updated = [...fees];
-    updated[index][field] = field === "cost" ? parseFloat(value) || 0 : value;
+    updated[index][field] = value;
+
+    // Auto-calc for type change
+    if (field === "type") {
+      updated[index].desc = value;
+      if (value === "Owner Title Insurance") {
+        updated[index].cost = getTitleInsurance(salesPrice, "Owner Title Insurance");
+      } else if (value === "Lender Title Insurance") {
+        updated[index].cost = getTitleInsurance(salesPrice, "Lender Title Insurance");
+      } else if (value === "Escrow Fees") {
+        updated[index].cost = getEscrowFee(salesPrice);
+      } else if (value === "Loan Origination Fee") {
+        updated[index].cost = loanAmount * 0.01;
+      } else if (value === "Commitment Fee AHFC .25%") {
+        updated[index].cost = loanAmount * 0.0025;
+      } else {
+        updated[index].cost = 0; // Custom
+      }
+    }
+
+    if (field === "cost") {
+      updated[index].cost = parseFloat(value) || 0;
+    }
+
     setFees(updated);
   };
 
   const addFee = () => {
-    setFees([...fees, { desc: "New Fee", cost: 0, paidBy: "Buyer" }]);
+    setFees([...fees, { type: "Custom", desc: "Custom Fee", cost: 0, paidBy: "Buyer" }]);
   };
 
   const removeFee = (index) => {
@@ -70,18 +124,16 @@ export default function ClosingCostApp() {
   const totalBuyerCosts = fees.reduce((sum, fee) => sum + getBuyerSellerAmounts(fee)[0], 0);
   const totalSellerCosts = fees.reduce((sum, fee) => sum + getBuyerSellerAmounts(fee)[1], 0);
 
-  // === Prepaids ===
   const upfrontMI = fhaMortgageIns;
-  const prepaidInterest = (loanAmount * (interestRate / 100) / 365) * 7; // Example: 7 days
+  const prepaidInterest = (loanAmount * (interestRate / 100) / 365) * 7;
   const prepaidTotal = upfrontMI + prepaidInterest;
 
   const totalToClose = downPayment + totalBuyerCosts + prepaidTotal;
 
   return (
-    <div className="max-w-5xl mx-auto p-8 bg-white rounded shadow">
+    <div id="print-area" className="max-w-5xl mx-auto p-8 bg-white rounded shadow">
       <h1 className="text-3xl font-bold mb-4 text-indigo-700">Buyer's Estimated Closing Costs</h1>
 
-      {/* === Agent & Deal Info === */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div>
           <label>Prepared For</label>
@@ -97,14 +149,43 @@ export default function ClosingCostApp() {
         </div>
 
         <div>
+          <label>Loan Type</label>
+          <select value={loanType} onChange={e => setLoanType(e.target.value)} className="w-full border p-2 mb-2">
+            <option value="">-- Select Loan Type --</option>
+            <option value="VA">VA</option>
+            <option value="FHA">FHA</option>
+            <option value="Conventional">Conventional</option>
+            <option value="USDA">USDA</option>
+            <option value="Other">Other</option>
+          </select>
+
+          {loanType === "VA" && (
+            <>
+              <label>VA Funding Fee %</label>
+              <select value={vaFeePercent} onChange={e => setVaFeePercent(parseFloat(e.target.value))} className="w-full border p-2 mb-2">
+                <option value="0">-- Select VA Funding Fee --</option>
+                <option value="2.3">2.3%</option>
+                <option value="3.6">3.6%</option>
+                <option value="1.65">1.65%</option>
+                <option value="1.4">1.4%</option>
+              </select>
+            </>
+          )}
+
+          {loanType === "FHA" && (
+            <>
+              <label>FHA Mortgage INS %</label>
+              <select value={fhaFeePercent} onChange={e => setFhaFeePercent(parseFloat(e.target.value))} className="w-full border p-2 mb-2">
+                <option value="0">None</option>
+                <option value="1.75">1.75%</option>
+              </select>
+            </>
+          )}
+
           <label>Sales Price</label>
           <input type="number" value={salesPrice} onChange={e => setSalesPrice(parseFloat(e.target.value) || 0)} className="w-full border p-2 mb-2" />
           <label>Down Payment %</label>
           <input type="number" value={downPaymentPercent} onChange={e => setDownPaymentPercent(parseFloat(e.target.value) || 0)} className="w-full border p-2 mb-2" />
-          <label>VA Funding Fee %</label>
-          <input type="number" value={vaFeePercent} onChange={e => setVaFeePercent(parseFloat(e.target.value) || 0)} className="w-full border p-2 mb-2" />
-          <label>FHA Mortgage INS %</label>
-          <input type="number" value={fhaFeePercent} onChange={e => setFhaFeePercent(parseFloat(e.target.value) || 0)} className="w-full border p-2 mb-2" />
           <label>Interest Rate %</label>
           <input type="number" value={interestRate} onChange={e => setInterestRate(parseFloat(e.target.value) || 0)} className="w-full border p-2 mb-2" />
           <label>Term (Years)</label>
@@ -116,7 +197,6 @@ export default function ClosingCostApp() {
         </div>
       </div>
 
-      {/* === Loan Summary === */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div><strong>Loan Amount:</strong> ${loanAmount.toFixed(2)}</div>
         <div><strong>Principal & Interest:</strong> ${principalAndInterest}</div>
@@ -124,10 +204,21 @@ export default function ClosingCostApp() {
         <div><strong>Monthly Payment:</strong> ${monthlyPayment}</div>
       </div>
 
-      {/* === Fee Table === */}
       <h2 className="text-xl font-bold mb-2 mt-8">Fee Table</h2>
       {fees.map((fee, idx) => (
         <div key={idx} className="flex gap-2 mb-2 items-center">
+          <select
+            value={fee.type}
+            onChange={e => updateFee(idx, "type", e.target.value)}
+            className="border p-2"
+          >
+            <option value="Custom">Custom</option>
+            <option value="Owner Title Insurance">Owner Title Insurance</option>
+            <option value="Lender Title Insurance">Lender Title Insurance</option>
+            <option value="Escrow Fees">Escrow Fees</option>
+            <option value="Loan Origination Fee">Loan Origination Fee</option>
+            <option value="Commitment Fee AHFC .25%">Commitment Fee AHFC .25%</option>
+          </select>
           <input value={fee.desc} onChange={e => updateFee(idx, "desc", e.target.value)} className="flex-1 border p-2" />
           <input type="number" value={fee.cost} onChange={e => updateFee(idx, "cost", e.target.value)} className="w-24 border p-2" />
           <select value={fee.paidBy} onChange={e => updateFee(idx, "paidBy", e.target.value)} className="border p-2">
@@ -147,7 +238,6 @@ export default function ClosingCostApp() {
         + Add Fee
       </button>
 
-      {/* === Prepaids === */}
       <div className="my-6">
         <h2 className="text-xl font-bold mb-2">Prepaids</h2>
         <div>Upfront MI: ${upfrontMI.toFixed(2)}</div>
@@ -155,7 +245,6 @@ export default function ClosingCostApp() {
         <div>Prepaid Total: ${prepaidTotal.toFixed(2)}</div>
       </div>
 
-      {/* === Totals === */}
       <div className="p-4 bg-indigo-50 rounded">
         <h2 className="text-xl font-bold mb-2">Summary</h2>
         <div>Buyer Closing Costs: ${totalBuyerCosts.toFixed(2)}</div>
@@ -164,6 +253,13 @@ export default function ClosingCostApp() {
         <div>Down Payment: ${downPayment.toFixed(2)}</div>
         <div className="text-lg font-bold mt-2">Total to Close: ${totalToClose.toFixed(2)}</div>
       </div>
+
+      <button
+        onClick={() => window.print()}
+        className="bg-rose-600 text-white px-6 py-3 rounded mt-6 hover:bg-rose-700 print:hidden"
+      >
+        Print or Save as PDF
+      </button>
     </div>
   );
 }
